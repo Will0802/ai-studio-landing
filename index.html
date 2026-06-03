@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Studio｜用 AI 幫你做任何事</title>
+  <style>
+    :root {
+      --bg: #09090b;
+      --bg2: #111114;
+      --card: #18181b;
+      --border: #27272a;
+      --accent: #7c3aed;
+      --accent2: #06b6d4;
+      --text: #fafafa;
+      --muted: #a1a1aa;
+      --radius: 16px;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: -apple-system, 'Inter', 'Noto Sans TC', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    /* NAV */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 40px;
+      background: rgba(9,9,11,0.85);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+    }
+    .logo {
+      font-size: 20px;
+      font-weight: 700;
+      background: linear-gradient(135deg, #7c3aed, #06b6d4);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .nav-links { display: flex; gap: 32px; list-style: none; }
+    .nav-links a { color: var(--muted); text-decoration: none; font-size: 14px; transition: color .2s; }
+    .nav-links a:hover { color: var(--text); }
+    .nav-cta {
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      padding: 10px 22px;
+      border-radius: 8px;
+      font-size: 14px;
+      cursor: pointer;
+      transition: opacity .2s;
+    }
+    .nav-cta:hover { opacity: .85; }
+
+    /* HERO */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 120px 24px 80px;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: -200px; left: 50%;
+      transform: translateX(-50%);
+      width: 900px; height: 600px;
+      background: radial-gradient(ellipse, rgba(124,58,237,.25) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .hero::after {
+      content: '';
+      position: absolute;
+      bottom: -100px; right: -200px;
+      width: 600px; height: 600px;
+      background: radial-gradient(ellipse, rgba(6,182,212,.15) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border: 1px solid var(--border);
+      border-radius: 100px;
+      padding: 6px 16px;
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 32px;
+      animation: fadeUp .6s ease both;
+    }
+    .badge span { width: 8px; height: 8px; border-radius: 50%; background: #22c55e; display: inline-block; animation: pulse 2s infinite; }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+    @keyframes fadeUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+
+    h1 {
+      font-size: clamp(40px, 7vw, 80px);
+      font-weight: 800;
+      line-height: 1.1;
+      letter-spacing: -2px;
+      margin-bottom: 24px;
+      animation: fadeUp .6s .1s ease both;
+    }
+    h1 .gradient {
+      background: linear-gradient(135deg, #7c3aed 0%, #06b6d4 60%, #7c3aed 100%);
+      background-size: 200%;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: shimmer 4s linear infinite;
+    }
+    @keyframes shimmer { 0%{background-position:0%} 100%{background-position:200%} }
+
+    .hero-sub {
+      font-size: clamp(16px, 2vw, 20px);
+      color: var(--muted);
+      max-width: 580px;
+      margin-bottom: 40px;
+      animation: fadeUp .6s .2s ease both;
+    }
+    .hero-btns {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      justify-content: center;
+      animation: fadeUp .6s .3s ease both;
+    }
+    .btn-primary {
+      background: var(--accent);
+      color: #fff;
+      padding: 14px 32px;
+      border-radius: 10px;
+      font-size: 16px;
+      font-weight: 600;
+      text-decoration: none;
+      transition: transform .2s, box-shadow .2s;
+      box-shadow: 0 0 30px rgba(124,58,237,.4);
+    }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 0 50px rgba(124,58,237,.6); }
+    .btn-secondary {
+      background: transparent;
+      color: var(--text);
+      padding: 14px 32px;
+      border-radius: 10px;
+      font-size: 16px;
+      border: 1px solid var(--border);
+      text-decoration: none;
+      transition: border-color .2s, background .2s;
+    }
+    .btn-secondary:hover { border-color: var(--accent); background: rgba(124,58,237,.08); }
+
+    .stats {
+      display: flex;
+      gap: 48px;
+      margin-top: 72px;
+      flex-wrap: wrap;
+      justify-content: center;
+      animation: fadeUp .6s .4s ease both;
+    }
+    .stat { text-align: center; }
+    .stat-num { font-size: 36px; font-weight: 800; background: linear-gradient(135deg,#7c3aed,#06b6d4); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+    .stat-label { font-size: 13px; color: var(--muted); margin-top: 4px; }
+
+    /* SECTION */
+    section { padding: 96px 24px; max-width: 1100px; margin: 0 auto; }
+    .section-label { font-size: 13px; color: var(--accent2); font-weight: 600; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 12px; }
+    .section-title { font-size: clamp(28px, 4vw, 48px); font-weight: 800; letter-spacing: -1px; margin-bottom: 16px; }
+    .section-sub { font-size: 17px; color: var(--muted); max-width: 560px; }
+
+    /* SERVICES */
+    #services { padding-top: 0; }
+    .services-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 20px;
+      margin-top: 56px;
+    }
+    .service-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 32px;
+      position: relative;
+      overflow: hidden;
+      transition: border-color .2s, transform .2s;
+    }
+    .service-card:hover { border-color: var(--accent); transform: translateY(-4px); }
+    .service-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      opacity: 0;
+      transition: opacity .2s;
+    }
+    .service-card:hover::before { opacity: 1; }
+    .service-icon { font-size: 36px; margin-bottom: 20px; }
+    .service-card h3 { font-size: 20px; font-weight: 700; margin-bottom: 10px; }
+    .service-card p { color: var(--muted); font-size: 15px; line-height: 1.7; }
+    .service-tags { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 20px; }
+    .tag { font-size: 12px; padding: 4px 10px; border-radius: 100px; background: rgba(124,58,237,.15); color: #a78bfa; border: 1px solid rgba(124,58,237,.3); }
+
+    /* PROCESS */
+    #process { background: var(--bg2); max-width: 100%; padding: 96px 24px; }
+    #process .inner { max-width: 1100px; margin: 0 auto; }
+    .steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 32px; margin-top: 56px; }
+    .step { position: relative; }
+    .step-num {
+      width: 48px; height: 48px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px; font-weight: 800;
+      margin-bottom: 20px;
+    }
+    .step h3 { font-size: 18px; font-weight: 700; margin-bottom: 8px; }
+    .step p { color: var(--muted); font-size: 14px; line-height: 1.7; }
+
+    /* PRICING */
+    .pricing-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 24px;
+      margin-top: 56px;
+    }
+    .price-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 36px;
+      transition: transform .2s;
+    }
+    .price-card.featured {
+      border-color: var(--accent);
+      background: linear-gradient(135deg, rgba(124,58,237,.1), rgba(6,182,212,.05));
+      position: relative;
+    }
+    .price-card:hover { transform: translateY(-4px); }
+    .featured-badge {
+      position: absolute;
+      top: -12px; left: 50%; transform: translateX(-50%);
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      color: #fff;
+      font-size: 12px;
+      font-weight: 700;
+      padding: 4px 16px;
+      border-radius: 100px;
+      white-space: nowrap;
+    }
+    .plan-name { font-size: 14px; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px; }
+    .plan-price { font-size: 48px; font-weight: 800; margin-bottom: 4px; }
+    .plan-price span { font-size: 18px; color: var(--muted); font-weight: 400; }
+    .plan-desc { font-size: 14px; color: var(--muted); margin-bottom: 28px; }
+    .plan-features { list-style: none; display: flex; flex-direction: column; gap: 12px; margin-bottom: 32px; }
+    .plan-features li { font-size: 14px; display: flex; align-items: center; gap: 10px; }
+    .plan-features li::before { content: '✓'; color: #22c55e; font-weight: 700; flex-shrink: 0; }
+    .plan-btn {
+      display: block;
+      text-align: center;
+      padding: 12px;
+      border-radius: 8px;
+      font-size: 15px;
+      font-weight: 600;
+      text-decoration: none;
+      transition: opacity .2s;
+    }
+    .plan-btn.primary { background: var(--accent); color: #fff; }
+    .plan-btn.outline { border: 1px solid var(--border); color: var(--text); }
+    .plan-btn:hover { opacity: .85; }
+
+    /* PORTFOLIO */
+    .portfolio-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 20px;
+      margin-top: 56px;
+    }
+    .portfolio-card {
+      border-radius: var(--radius);
+      overflow: hidden;
+      border: 1px solid var(--border);
+      background: var(--card);
+      transition: transform .2s, border-color .2s;
+    }
+    .portfolio-card:hover { transform: translateY(-4px); border-color: var(--accent); }
+    .portfolio-img {
+      height: 180px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 56px;
+    }
+    .p1 { background: linear-gradient(135deg, #1e1b4b, #312e81); }
+    .p2 { background: linear-gradient(135deg, #064e3b, #065f46); }
+    .p3 { background: linear-gradient(135deg, #7c2d12, #9a3412); }
+    .portfolio-info { padding: 20px 24px; }
+    .portfolio-info h3 { font-size: 16px; font-weight: 700; margin-bottom: 6px; }
+    .portfolio-info p { font-size: 13px; color: var(--muted); }
+    .portfolio-meta { display: flex; justify-content: space-between; align-items: center; margin-top: 16px; }
+    .portfolio-time { font-size: 12px; color: var(--muted); }
+    .portfolio-link { font-size: 12px; color: var(--accent2); text-decoration: none; }
+
+    /* TESTIMONIALS */
+    #testimonials { background: var(--bg2); max-width: 100%; padding: 96px 24px; }
+    #testimonials .inner { max-width: 1100px; margin: 0 auto; }
+    .testimonials-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin-top: 56px; }
+    .testimonial {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 28px;
+    }
+    .stars { color: #fbbf24; font-size: 14px; margin-bottom: 16px; }
+    .testimonial p { font-size: 15px; line-height: 1.7; color: var(--muted); margin-bottom: 20px; }
+    .author { display: flex; align-items: center; gap: 12px; }
+    .avatar { width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, var(--accent), var(--accent2)); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; }
+    .author-info strong { font-size: 14px; display: block; }
+    .author-info span { font-size: 12px; color: var(--muted); }
+
+    /* CTA */
+    .cta-section {
+      text-align: center;
+      padding: 120px 24px;
+      position: relative;
+      overflow: hidden;
+    }
+    .cta-section::before {
+      content: '';
+      position: absolute;
+      top: 50%; left: 50%; transform: translate(-50%,-50%);
+      width: 800px; height: 400px;
+      background: radial-gradient(ellipse, rgba(124,58,237,.2) 0%, transparent 70%);
+    }
+    .cta-section h2 { font-size: clamp(32px, 5vw, 60px); font-weight: 800; letter-spacing: -1px; margin-bottom: 20px; }
+    .cta-section p { font-size: 18px; color: var(--muted); margin-bottom: 40px; }
+
+    /* FOOTER */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 40px 40px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+    footer .logo { font-size: 18px; }
+    footer p { font-size: 13px; color: var(--muted); }
+
+    /* COUNTER ANIMATION */
+    .count-up { transition: all .5s ease; }
+
+    @media (max-width: 640px) {
+      nav { padding: 14px 20px; }
+      .nav-links { display: none; }
+      .stats { gap: 32px; }
+      footer { flex-direction: column; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <div class="logo">⚡ AI Studio</div>
+    <ul class="nav-links">
+      <li><a href="#services">服務</a></li>
+      <li><a href="#process">流程</a></li>
+      <li><a href="#portfolio">作品</a></li>
+      <li><a href="#pricing">方案</a></li>
+    </ul>
+    <button class="nav-cta" onclick="document.querySelector('#contact').scrollIntoView({behavior:'smooth'})">免費諮詢</button>
+  </nav>
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="badge">
+      <span></span> 已服務 30+ 客戶，交付超過 50 個專案
+    </div>
+    <h1>
+      <span class="gradient">小李協理</span><br/>
+      幫你把想法<br/>變成產品
+    </h1>
+    <p class="hero-sub">
+      結合 Claude Code 的視覺設計力與 Codex 的邏輯執行力，
+      週末交付完整可用的網站、工具與自動化流程。
+    </p>
+    <div class="hero-btns">
+      <a href="#pricing" class="btn-primary">查看方案 →</a>
+      <a href="#portfolio" class="btn-secondary">看作品集</a>
+    </div>
+    <div class="stats">
+      <div class="stat">
+        <div class="stat-num" data-target="30">0</div>
+        <div class="stat-label">完成專案</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num" data-target="48">0</div>
+        <div class="stat-label">小時平均交付</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num" data-target="98">0</div>
+        <div class="stat-label">客戶滿意度 %</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num" data-target="5">0</div>
+        <div class="stat-label">倍速度提升</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SERVICES -->
+  <section id="services">
+    <div class="section-label">服務項目</div>
+    <h2 class="section-title">你需要什麼，<br/>我們都做得到</h2>
+    <p class="section-sub">從落地頁到完整 Web App，AI 賦能讓開發速度快 5 倍，價格只要傳統的一半。</p>
+    <div class="services-grid">
+      <div class="service-card">
+        <div class="service-icon">🎨</div>
+        <h3>落地頁 / 官網</h3>
+        <p>高轉換率的視覺設計，結合 AI 生成的文案與排版，讓你的品牌第一眼就抓住客戶。</p>
+        <div class="service-tags">
+          <span class="tag">HTML/CSS</span>
+          <span class="tag">動畫效果</span>
+          <span class="tag">RWD</span>
+          <span class="tag">SEO 優化</span>
+        </div>
+      </div>
+      <div class="service-card">
+        <div class="service-icon">⚙️</div>
+        <h3>自動化工作流</h3>
+        <p>取代 n8n、Make.com 那些繁瑣的拉線設定。用 Claude Code Routines 描述你要的流程，直接運行。</p>
+        <div class="service-tags">
+          <span class="tag">排程任務</span>
+          <span class="tag">API 整合</span>
+          <span class="tag">資料處理</span>
+        </div>
+      </div>
+      <div class="service-card">
+        <div class="service-icon">🛠️</div>
+        <h3>AI 工具 Web App</h3>
+        <p>把你的 AI 創意變成實際可用的工具：計算機、轉換器、生成器，帶有真實功能的互動應用。</p>
+        <div class="service-tags">
+          <span class="tag">React</span>
+          <span class="tag">API 串接</span>
+          <span class="tag">即時更新</span>
+        </div>
+      </div>
+      <div class="service-card">
+        <div class="service-icon">📊</div>
+        <h3>儀表板 / 報表</h3>
+        <p>將你的資料視覺化，客製化儀表板讓你一眼掌握關鍵指標，支援即時數據同步。</p>
+        <div class="service-tags">
+          <span class="tag">Chart.js</span>
+          <span class="tag">資料串接</span>
+          <span class="tag">即時更新</span>
+        </div>
+      </div>
+      <div class="service-card">
+        <div class="service-icon">✉️</div>
+        <h3>Email / 社群自動化</h3>
+        <p>設定一次，永久運行。AI 自動撰寫、排程發送 Email、社群貼文，讓你的行銷不中斷。</p>
+        <div class="service-tags">
+          <span class="tag">Gmail API</span>
+          <span class="tag">排程發送</span>
+          <span class="tag">個人化</span>
+        </div>
+      </div>
+      <div class="service-card">
+        <div class="service-icon">🤖</div>
+        <h3>AI 客服機器人</h3>
+        <p>24 小時自動回答客戶問題，整合到你的網站或 LINE，大幅降低客服人力成本。</p>
+        <div class="service-tags">
+          <span class="tag">Claude API</span>
+          <span class="tag">LINE Bot</span>
+          <span class="tag">知識庫</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROCESS -->
+  <section id="process" style="max-width:100%;padding:96px 24px;background:var(--bg2);">
+    <div class="inner" style="max-width:1100px;margin:0 auto;">
+      <div class="section-label">合作流程</div>
+      <h2 class="section-title">從想法到上線，<br/>只需 4 個步驟</h2>
+      <div class="steps">
+        <div class="step">
+          <div class="step-num">01</div>
+          <h3>需求釐清</h3>
+          <p>免費 30 分鐘諮詢，確認你的目標、受眾與功能需求，提供明確的開發範疇。</p>
+        </div>
+        <div class="step">
+          <div class="step-num">02</div>
+          <h3>AI 快速原型</h3>
+          <p>24 小時內提供可點擊的原型，讓你在正式開發前確認方向，避免浪費時間。</p>
+        </div>
+        <div class="step">
+          <div class="step-num">03</div>
+          <h3>迭代開發</h3>
+          <p>每日進度更新，隨時可以調整需求。AI 加速讓修改成本極低，說改就改。</p>
+        </div>
+        <div class="step">
+          <div class="step-num">04</div>
+          <h3>交付上線</h3>
+          <p>提供完整原始碼、部署協助，以及 30 天免費維護，確保產品穩定運行。</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PORTFOLIO -->
+  <section id="portfolio">
+    <div class="section-label">作品集</div>
+    <h2 class="section-title">真實交付的專案</h2>
+    <p class="section-sub">每個都在 48 小時內完成，客戶滿意並已在使用中。</p>
+    <div class="portfolio-grid">
+      <div class="portfolio-card">
+        <div class="portfolio-img p1">🛒</div>
+        <div class="portfolio-info">
+          <h3>電商品牌落地頁</h3>
+          <p>保健品牌官網，含產品展示、會員方案、結帳流程。上線首週轉換率 8.2%。</p>
+          <div class="portfolio-meta">
+            <span class="portfolio-time">⏱ 交付：36 小時</span>
+            <a href="#" class="portfolio-link">查看案例 →</a>
+          </div>
+        </div>
+      </div>
+      <div class="portfolio-card">
+        <div class="portfolio-img p2">📈</div>
+        <div class="portfolio-info">
+          <h3>SaaS 數據儀表板</h3>
+          <p>即時追蹤 5 個平台的廣告投放數據，每天自動產生報表寄送到 Email。</p>
+          <div class="portfolio-meta">
+            <span class="portfolio-time">⏱ 交付：48 小時</span>
+            <a href="#" class="portfolio-link">查看案例 →</a>
+          </div>
+        </div>
+      </div>
+      <div class="portfolio-card">
+        <div class="portfolio-img p3">🤖</div>
+        <div class="portfolio-info">
+          <h3>餐廳 LINE 訂位機器人</h3>
+          <p>自動回覆訂位詢問、送出確認、提醒客人，節省前台 70% 接電話時間。</p>
+          <div class="portfolio-meta">
+            <span class="portfolio-time">⏱ 交付：24 小時</span>
+            <a href="#" class="portfolio-link">查看案例 →</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PRICING -->
+  <section id="pricing" style="background:var(--bg2);max-width:100%;padding:96px 24px;">
+    <div style="max-width:1100px;margin:0 auto;">
+      <div class="section-label">方案定價</div>
+      <h2 class="section-title">透明定價，<br/>沒有隱藏費用</h2>
+      <p class="section-sub">所有方案皆含原始碼、部署協助與 30 天維護。</p>
+      <div class="pricing-grid">
+        <div class="price-card">
+          <div class="plan-name">入門方案</div>
+          <div class="plan-price">NT$8,000 <span>起</span></div>
+          <div class="plan-desc">適合個人品牌、小型活動或測試想法</div>
+          <ul class="plan-features">
+            <li>落地頁（單頁）</li>
+            <li>RWD 響應式設計</li>
+            <li>SEO 基礎優化</li>
+            <li>48 小時交付</li>
+            <li>1 次修改回合</li>
+          </ul>
+          <a href="#contact" class="plan-btn outline">開始諮詢</a>
+        </div>
+        <div class="price-card featured">
+          <div class="featured-badge">🔥 最多人選擇</div>
+          <div class="plan-name">專業方案</div>
+          <div class="plan-price">NT$25,000 <span>起</span></div>
+          <div class="plan-desc">適合品牌官網、功能型 Web App</div>
+          <ul class="plan-features">
+            <li>多頁網站或 Web App</li>
+            <li>後端 API 整合</li>
+            <li>資料庫設計</li>
+            <li>72 小時交付</li>
+            <li>3 次修改回合</li>
+            <li>30 天免費維護</li>
+          </ul>
+          <a href="#contact" class="plan-btn primary">開始諮詢</a>
+        </div>
+        <div class="price-card">
+          <div class="plan-name">企業方案</div>
+          <div class="plan-price">NT$60,000 <span>起</span></div>
+          <div class="plan-desc">自動化系統、AI 工具、複雜平台</div>
+          <ul class="plan-features">
+            <li>完整 SaaS / 平台開發</li>
+            <li>AI 功能整合（Claude / GPT）</li>
+            <li>自動化工作流程</li>
+            <li>客製化交付時程</li>
+            <li>無限修改</li>
+            <li>3 個月維護支援</li>
+          </ul>
+          <a href="#contact" class="plan-btn outline">聯絡討論</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TESTIMONIALS -->
+  <section id="testimonials" style="background:var(--bg);max-width:100%;padding:96px 24px;">
+    <div style="max-width:1100px;margin:0 auto;">
+      <div class="section-label">客戶見證</div>
+      <h2 class="section-title">他們這樣說</h2>
+      <div class="testimonials-grid">
+        <div class="testimonial">
+          <div class="stars">★★★★★</div>
+          <p>「原本預期要花兩週的官網，36 小時就拿到了。設計比我想像的還要好，客戶反應超棒。」</p>
+          <div class="author">
+            <div class="avatar">陳</div>
+            <div class="author-info">
+              <strong>陳小姐</strong>
+              <span>保健品牌創辦人</span>
+            </div>
+          </div>
+        </div>
+        <div class="testimonial">
+          <div class="stars">★★★★★</div>
+          <p>「每天自動跑報表、寄 Email 的功能真的幫我省了很多時間。我以為要花好幾萬，結果超划算。」</p>
+          <div class="author">
+            <div class="avatar">林</div>
+            <div class="author-info">
+              <strong>林先生</strong>
+              <span>電商行銷總監</span>
+            </div>
+          </div>
+        </div>
+        <div class="testimonial">
+          <div class="stars">★★★★★</div>
+          <p>「LINE 機器人上線後前台壓力少了一大半，訂位確認準確率 100%，客人反應也很好。」</p>
+          <div class="author">
+            <div class="avatar">王</div>
+            <div class="author-info">
+              <strong>王老闆</strong>
+              <span>餐廳負責人</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <div class="cta-section" id="contact">
+    <h2>準備好開始了嗎？</h2>
+    <p>免費諮詢 30 分鐘，告訴我你的想法，<br/>我來告訴你怎麼用 AI 最快做出來。</p>
+    <a href="mailto:hello@aistudio.tw" class="btn-primary" style="display:inline-block;font-size:18px;padding:18px 48px;">
+      預約免費諮詢 →
+    </a>
+    <p style="margin-top:24px;font-size:14px;color:var(--muted);">通常在 2 小時內回覆 · 不收任何費用</p>
+  </div>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="logo">⚡ AI Studio</div>
+    <p>© 2026 AI Studio. 用 Claude Code 打造。</p>
+  </footer>
+
+  <script>
+    // 數字動畫
+    function animateCount(el) {
+      const target = +el.dataset.target;
+      const suffix = el.textContent.includes('%') ? '%' : el.textContent.includes('K') ? 'K' : '';
+      let current = 0;
+      const step = target / 60;
+      const timer = setInterval(() => {
+        current = Math.min(current + step, target);
+        el.textContent = Math.floor(current) + (target >= 48 && target < 100 ? '' : '') ;
+        if (current >= target) {
+          el.textContent = target + (target === 98 ? '%' : target === 48 ? '' : '+');
+          clearInterval(timer);
+        }
+      }, 16);
+    }
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          animateCount(e.target);
+          observer.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.5 });
+
+    document.querySelectorAll('[data-target]').forEach(el => observer.observe(el));
+
+    // 滑入動畫
+    const fadeObserver = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          e.target.style.opacity = '1';
+          e.target.style.transform = 'translateY(0)';
+        }
+      });
+    }, { threshold: 0.1 });
+
+    document.querySelectorAll('.service-card, .step, .price-card, .portfolio-card, .testimonial').forEach(el => {
+      el.style.opacity = '0';
+      el.style.transform = 'translateY(24px)';
+      el.style.transition = 'opacity .5s ease, transform .5s ease';
+      fadeObserver.observe(el);
+    });
+  </script>
+</body>
+</html>
